@@ -13,7 +13,7 @@ variables:
   listpolicyimageRepository: 'listpolicy'
 
   containerRegistry: 'apigwacr.azurecr.io'
-  listdockerfilePath: '/docker/Dockerfile'
+  listdockerfilePath: 'hello-python/docker/Dockerfile'
 
 
   tag: 'latest'
