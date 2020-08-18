@@ -10,7 +10,7 @@ resources:
 variables:
   # Container registry service connection established during pipeline creation
   dockerRegistryServiceConnection: 'apigwacr'
-  listpolicyimageRepository: 'listpolicy'
+  listpolicyimageRepository: 'helloworld'
 
   containerRegistry: 'apigwacr.azurecr.io'
   listdockerfilePath: '**/docker/Dockerfile'
