@@ -1,0 +1,63 @@
+# Build and push an image to Azure Container Registry
+# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
+
+trigger:
+- master
+
+resources:
+- repo: self
+
+variables:
+  # Container registry service connection established during pipeline creation
+  dockerRegistryServiceConnection: 'apigwacr'
+  listpolicyimageRepository: 'listpolicy'
+
+  containerRegistry: 'apigwacr.azurecr.io'
+  listdockerfilePath: '/docker/Dockerfile'
+
+
+  tag: 'latest'
+  tag_buildnumber: $(Build.BuildNumber)
+  
+  # Agent VM image name
+  vmImageName: 'ubuntu-latest'
+
+stages:
+- stage: Build
+  displayName: Build and push stage
+  jobs:  
+  - job: Build
+    displayName: Build
+    pool:
+      vmImage: $(vmImageName)
+    steps:
+    - task: Docker@2
+      displayName: Login to ACR 
+      inputs:
+        command: login
+        containerRegistry: $(dockerRegistryServiceConnection)
+ 
+    - task: Docker@2
+      displayName: Build and push an image to logic
+      inputs:
+        command: buildAndPush
+        repository: $(listpolicyimageRepository)
+        dockerfile: $(listdockerfilePath)
+ #       containerRegistry: $(dockerRegistryServiceConnection)
+        tags: |
+          $(tag)
+          $(tag_buildnumber)
+
+
+    - task: Docker@2
+      displayName: Logout of ACR
+      inputs:
+         command: logout
+         containerRegistry: $(dockerRegistryServiceConnection)
+# Docker
+    - task: CopyFiles@2
+      displayName: 'Copy Files to: $(Build.ArtifactStagingDirectory)'
+      inputs:
+        TargetFolder: '$(Build.ArtifactStagingDirectory)'
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Artifact: drop'
